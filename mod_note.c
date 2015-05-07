@@ -42,7 +42,7 @@ module AP_MODULE_DECLARE_DATA note_module =
 static void *create_note_dir_config(apr_pool_t *pool, char *path)
 {
     /* Our per-directory config is just a list of key/value pairs. */
-    return apr_make_table(pool, 1);
+    return apr_table_make(pool, 1);
 }
 
 static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *addconfig)
@@ -50,7 +50,7 @@ static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *add
     /* Since it's all just tables, use the overlay function. */
     return ap_overlay_tables(pool, addconfig, baseconfig);
 }
-
+
 static const char *add_note(cmd_parms *cmd, void *mconfig, char *key, char *value)
 {
     /* Add the key/value pair to the table. */
