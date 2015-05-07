@@ -22,7 +22,7 @@ static void *create_note_dir_config(apr_pool_t *pool, char *path);
 static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *addconfig);
 static const char *add_note(cmd_parms *cmd, void *mconfig, char *key, char *value);
 
-static const cmd_rec note_command_table[] = {
+static const command_rec note_command_table[] = {
     AP_INIT_TAKE2("Note", add_note, mconfig, OR_ALL, "Key/value pair to set as note."),
     {NULL}
 }
