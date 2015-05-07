@@ -4,4 +4,4 @@ $(MOD).o: $(MOD).c
 	apxs -c $(MOD).c
 
 clean:
-	-rm $(MOD).o
+	-rm *.*o *~ *.la
