@@ -20,7 +20,7 @@ static void register_note_hooks(apr_pool_t *pool);
 static int set_notes(request_rec *r);
 static void *create_note_dir_config(apr_pool_t *pool, char *path);
 static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *addconfig);
-static const char *add_note(cmd_parms *cmd, void *mconfig, char *key, char *value);
+static const char *add_note(cmd_parms *cmd, void *mconfig, const char *key, const char *value);
 
 static const command_rec note_command_table[] = {
     AP_INIT_TAKE2("Note", add_note, NULL, OR_ALL, "Key/value pair to set as note."),
@@ -48,14 +48,14 @@ static void *create_note_dir_config(apr_pool_t *pool, char *path)
 static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *addconfig)
 {
     /* Since it's all just tables, use the overlay function. */
-    return ap_table_overlay(pool, addconfig, baseconfig);
+    return apr_table_overlay(pool, addconfig, baseconfig);
 }
-
-static const char *add_note(cmd_parms *cmd, void *mconfig, char *key, char *value)
+
+static const char *add_note(cmd_parms *cmd, void *mconfig, const char *key, const char *value)
 {
     /* Add the key/value pair to the table. */
     apr_table_t *notes = (apr_table_t *) mconfig;
-    ap_table_set(notes, key, value);
+    apr_table_set(notes, key, value);
     return NULL;
 }
 
@@ -69,7 +69,7 @@ static int set_notes(request_rec *r)
   /* Fetch the notes that have been configured. */
   apr_table_t *notes = ap_get_module_config(r->per_dir_config, &note_module);
   /* Overlay them onto the request's existing notes. */
-  r->notes = ap_table_overlay(r->pool, notes, r->notes);
+  r->notes = apr_table_overlay(r->pool, notes, r->notes);
   /* Tell Apache it has to continue processing. */
   return DECLINED;
 }
