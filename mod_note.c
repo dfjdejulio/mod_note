@@ -18,6 +18,14 @@
 /* prototypes */
 static void register_note_hooks(apr_pool_t *pool);
 static int set_notes(request_rec *r);
+static void *create_note_dir_config(apr_pool_t *pool, char *path);
+static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *addconfig);
+static const char *add_note(cmd_parms *cmd, void *mconfig, char *key, char *value);
+
+static const cmd_rec note_command_table[] = {
+    AP_INIT_TAKE2("Note", add_note, mconfig, OR_ALL, "Key/value pair to set as note."),
+    {NULL}
+}
 
 /* apache module struct */
 module AP_MODULE_DECLARE_DATA note_module =
@@ -30,6 +38,26 @@ module AP_MODULE_DECLARE_DATA note_module =
     note_command_table,        /* Any directives we may have for httpd */
     register_note_hooks     /* Our hook registering function */
   };
+
+static void *create_note_dir_config(apr_pool_t *pool, char *path)
+{
+    /* Our per-directory config is just a list of key/value pairs. */
+    return apr_make_table(pool, 1);
+}
+
+static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *addconfig)
+{
+    /* Since it's all just tables, use the overlay function. */
+    return ap_overlay_tables(pool, addconfig, baseconfig);
+}
+
+static const char *add_note(cmd_parms *cmd, void *mconfig, char *key, char *value)
+{
+    /* Add the key/value pair to the table. */
+    apr_table_t *notes = (apr_table_t *) mconfig;
+    ap_table_set(notes, key, value);
+    return NULL;
+}
 
 static void register_note_hooks(apr_pool_t *pool)
 {
