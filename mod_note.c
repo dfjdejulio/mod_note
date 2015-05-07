@@ -25,7 +25,7 @@ static const char *add_note(cmd_parms *cmd, void *mconfig, char *key, char *valu
 static const command_rec note_command_table[] = {
     AP_INIT_TAKE2("Note", add_note, NULL, OR_ALL, "Key/value pair to set as note."),
     {NULL}
-}
+};
 
 /* apache module struct */
 module AP_MODULE_DECLARE_DATA note_module =
