@@ -48,7 +48,7 @@ static void *create_note_dir_config(apr_pool_t *pool, char *path)
 static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *addconfig)
 {
     /* Since it's all just tables, use the overlay function. */
-    return ap_overlay_tables(pool, addconfig, baseconfig);
+    return ap_table_overlay(pool, addconfig, baseconfig);
 }
 
 static const char *add_note(cmd_parms *cmd, void *mconfig, char *key, char *value)
@@ -69,7 +69,7 @@ static int set_notes(request_rec *r)
   /* Fetch the notes that have been configured. */
   apr_table_t *notes = ap_get_module_config(r->per_dir_config, &note_module);
   /* Overlay them onto the request's existing notes. */
-  r->notes = ap_overlay_tables(r->pool, notes, r->notes);
+  r->notes = ap_table_overlay(r->pool, notes, r->notes);
   /* Tell Apache it has to continue processing. */
   return DECLINED;
 }
