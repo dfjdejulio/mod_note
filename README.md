@@ -20,4 +20,11 @@ Note Author dfjdejulio
 LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" \"%{Author}n\"" localcustomlog
 CustomLog "/tmp/authorlog.txt" localcustomlog
 ```
-...you would get a custom log in /tmp/authorlog.txt that showed a "-" as its final field for most requests, but "dfjdejulio" as its final field for requests in-scope for that .htaccess file.
+...you would get a custom log in /tmp/authorlog.txt that showed a
+"-" as its final field for most requests, but "dfjdejulio" as its
+final field for requests in-scope for that .htaccess file.
+
+You might take advantage of this by using that field to slice up
+your log files before feeding them into analytics software, so
+individual authors could get analytics for their own content but
+not anyone else's.
