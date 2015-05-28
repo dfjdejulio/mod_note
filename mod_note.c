@@ -16,42 +16,46 @@
 #include "util_script.h"
 
 /* prototypes */
-static void register_note_hooks(apr_pool_t *pool);
-static int set_notes(request_rec *r);
-static void *create_note_dir_config(apr_pool_t *pool, char *path);
-static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *addconfig);
-static const char *add_note(cmd_parms *cmd, void *mconfig, const char *key, const char *value);
+static void register_note_hooks(apr_pool_t * pool);
+static int set_notes(request_rec * r);
+static void *create_note_dir_config(apr_pool_t * pool, char *path);
+static void *merge_note_dir_config(apr_pool_t * pool, void *baseconfig,
+                                   void *addconfig);
+static const char *add_note(cmd_parms * cmd, void *mconfig, const char *key,
+                            const char *value);
 
 static const command_rec note_command_table[] = {
-    AP_INIT_TAKE2("Note", add_note, NULL, OR_ALL, "Key/value pair to set as note."),
+    AP_INIT_TAKE2("Note", add_note, NULL, OR_ALL,
+                  "Key/value pair to set as note."),
     {NULL}
 };
 
 /* apache module struct */
-module AP_MODULE_DECLARE_DATA note_module =
-  {
-    STANDARD20_MODULE_STUFF,	
-    create_note_dir_config, /* Per-directory configuration handler */
-    merge_note_dir_config,  /* Merge handler for per-directory configurations */
-    NULL,                   /* Per-server configuration handler */
-    NULL,                   /* Merge handler for per-server configurations */
-    note_command_table,        /* Any directives we may have for httpd */
-    register_note_hooks     /* Our hook registering function */
-  };
+module AP_MODULE_DECLARE_DATA note_module = {
+    STANDARD20_MODULE_STUFF,
+    create_note_dir_config,     /* Per-directory configuration handler */
+    merge_note_dir_config,      /* Merge handler for per-directory configurations */
+    NULL,                       /* Per-server configuration handler */
+    NULL,                       /* Merge handler for per-server configurations */
+    note_command_table,         /* Any directives we may have for httpd */
+    register_note_hooks         /* Our hook registering function */
+};
 
-static void *create_note_dir_config(apr_pool_t *pool, char *path)
+static void *create_note_dir_config(apr_pool_t * pool, char *path)
 {
     /* Our per-directory config is just a list of key/value pairs. */
     return apr_table_make(pool, 1);
 }
 
-static void *merge_note_dir_config(apr_pool_t *pool, void *baseconfig, void *addconfig)
+static void *merge_note_dir_config(apr_pool_t * pool, void *baseconfig,
+                                   void *addconfig)
 {
     /* Since it's all just tables, use the overlay function. */
     return apr_table_overlay(pool, addconfig, baseconfig);
 }
 
-static const char *add_note(cmd_parms *cmd, void *mconfig, const char *key, const char *value)
+static const char *add_note(cmd_parms * cmd, void *mconfig, const char *key,
+                            const char *value)
 {
     /* Add the key/value pair to the table. */
     apr_table_t *notes = (apr_table_t *) mconfig;
@@ -59,17 +63,18 @@ static const char *add_note(cmd_parms *cmd, void *mconfig, const char *key, cons
     return NULL;
 }
 
-static void register_note_hooks(apr_pool_t *pool)
+static void register_note_hooks(apr_pool_t * pool)
 {
-  ap_hook_handler(set_notes, NULL, NULL, APR_HOOK_FIRST);
+    ap_hook_handler(set_notes, NULL, NULL, APR_HOOK_FIRST);
 }
 
-static int set_notes(request_rec *r)
+static int set_notes(request_rec * r)
 {
-  /* Fetch the notes that have been configured. */
-  apr_table_t *notes = ap_get_module_config(r->per_dir_config, &note_module);
-  /* Overlay them onto the request's existing notes. */
-  r->notes = apr_table_overlay(r->pool, notes, r->notes);
-  /* Tell Apache it has to continue processing. */
-  return DECLINED;
+    /* Fetch the notes that have been configured. */
+    apr_table_t *notes =
+        ap_get_module_config(r->per_dir_config, &note_module);
+    /* Overlay them onto the request's existing notes. */
+    r->notes = apr_table_overlay(r->pool, notes, r->notes);
+    /* Tell Apache it has to continue processing. */
+    return DECLINED;
 }
